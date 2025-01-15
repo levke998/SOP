@@ -1,0 +1,27 @@
+CREATE TABLE meccs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    datum DATE NOT NULL,
+    kezdes TIME NOT NULL,
+    belepo DECIMAL(10, 2) NOT NULL,
+    tipus VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE nezo (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nev VARCHAR(100) NOT NULL,
+    ferfi BOOLEAN NOT NULL,
+    berletes BOOLEAN NOT NULL
+);
+
+CREATE TABLE belepes (
+    nezoid INT NOT NULL,
+    meccsid INT NOT NULL,
+    idopont DATETIME NOT NULL,
+    FOREIGN KEY (nezoid) REFERENCES nezo(id),
+    FOREIGN KEY (meccsid) REFERENCES meccs(id)
+);
+
+CREATE TABLE users(
+    username VARCHAR(20),
+    pw VARCHAR(20)
+);

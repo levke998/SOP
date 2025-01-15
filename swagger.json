@@ -1,0 +1,90 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Mérkőzések API",
+      "description": "A mérkőzések kezelésére szolgáló REST API"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000"
+      }
+    ],
+    "paths": {
+      "/bajnoki": {
+        "get": {
+          "summary": "Bajnoki mérkőzések dátumainak lekérdezése",
+          "responses": {
+            "200": {
+              "description": "Bajnoki mérkőzések időrendben",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "2025-03-02"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/utolsojegyar": {
+        "get": {
+          "summary": "Idény legutolsó mérkőzésének jegyára",
+          "responses": {
+            "200": {
+              "description": "A jegyár lekérdezve",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "belepo": {
+                        "type": "number",
+                        "example": 5000
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/nezoszam": {
+        "get": {
+          "summary": "Mérkőzésenkénti nézőszám lekérdezése",
+          "responses": {
+            "200": {
+              "description": "Nézőszámok időrendben",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "datum": {
+                          "type": "string",
+                          "example": "2025-03-02"
+                        },
+                        "nezoszam": {
+                          "type": "number",
+                          "example": 150
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
