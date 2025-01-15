@@ -1,90 +1,193 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "version": "1.0.0",
-      "title": "Mérkőzések API",
-      "description": "A mérkőzések kezelésére szolgáló REST API"
-    },
-    "servers": [
-      {
-        "url": "http://localhost:3000"
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Mérkőzés API",
+    "description": "Egy RESTful API a mérkőzések, nézők és belépések kezelésére."
+  },
+  "host": "127.0.0.1:3000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "Bejelentkezés és token generálása",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": { "type": "string" },
+                "password": { "type": "string" }
+              },
+              "required": ["username", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sikeres bejelentkezés",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": { "type": "string" }
+              }
+            }
+          },
+          "401": { "description": "Hibás felhasználónév vagy jelszó" }
+        }
       }
-    ],
-    "paths": {
-      "/bajnoki": {
-        "get": {
-          "summary": "Bajnoki mérkőzések dátumainak lekérdezése",
-          "responses": {
-            "200": {
-              "description": "Bajnoki mérkőzések időrendben",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "example": "2025-03-02"
-                    }
-                  }
+    },
+    "/meccsek": {
+      "get": {
+        "summary": "Minden mérkőzés listázása",
+        "responses": {
+          "200": {
+            "description": "Sikeres válasz",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "datum": { "type": "string", "format": "date" },
+                  "kezdes": { "type": "string" },
+                  "tipus": { "type": "string" },
+                  "belepo": { "type": "integer" }
                 }
               }
             }
           }
         }
       },
-      "/utolsojegyar": {
-        "get": {
-          "summary": "Idény legutolsó mérkőzésének jegyára",
-          "responses": {
-            "200": {
-              "description": "A jegyár lekérdezve",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "belepo": {
-                        "type": "number",
-                        "example": 5000
-                      }
-                    }
-                  }
-                }
-              }
+      "post": {
+        "summary": "Új mérkőzés hozzáadása",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "datum": { "type": "string", "format": "date" },
+                "kezdes": { "type": "string" },
+                "belepo": { "type": "integer" },
+                "tipus": { "type": "string" }
+              },
+              "required": ["datum", "kezdes", "belepo", "tipus"]
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Mérkőzés sikeresen hozzáadva" },
+          "403": { "description": "Nincs jogosultság" }
+        },
+        "security": [
+          { "bearerAuth": [] }
+        ]
+      }
+    },
+    "/bajnoki": {
+      "get": {
+        "summary": "Bajnoki mérkőzések időrendben",
+        "responses": {
+          "200": {
+            "description": "Sikeres válasz",
+            "schema": {
+              "type": "array",
+              "items": { "type": "string", "format": "date" }
             }
           }
         }
-      },
-      "/nezoszam": {
-        "get": {
-          "summary": "Mérkőzésenkénti nézőszám lekérdezése",
-          "responses": {
-            "200": {
-              "description": "Nézőszámok időrendben",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "datum": {
-                          "type": "string",
-                          "example": "2025-03-02"
-                        },
-                        "nezoszam": {
-                          "type": "number",
-                          "example": 150
-                        }
-                      }
-                    }
-                  }
+      }
+    },
+    "/belepesek/{meccsid}": {
+      "get": {
+        "summary": "Nézők lekérdezése adott mérkőzésre",
+        "parameters": [
+          {
+            "name": "meccsid",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sikeres válasz",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "nev": { "type": "string" },
+                  "ferfi": { "type": "boolean" },
+                  "berletes": { "type": "boolean" },
+                  "idopont": { "type": "string", "format": "date-time" }
                 }
               }
             }
+          },
+          "403": { "description": "Nincs jogosultság" }
+        },
+        "security": [
+          { "bearerAuth": [] }
+        ]
+      }
+    },
+    "/utolsojegyar": {
+      "get": {
+        "summary": "Legutolsó mérkőzés jegyárának lekérdezése",
+        "responses": {
+          "200": {
+            "description": "Sikeres válasz",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "belepo": { "type": "integer" }
+                }
+              }
+            }
+          },
+          "403": { "description": "Nincs jogosultság" }
+        },
+        "security": [
+          { "bearerAuth": [] }
+        ]
+      }
+    },
+    "/meccsek/{id}": {
+      "delete": {
+        "summary": "Mérkőzés törlése",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
           }
-        }
+        ],
+        "responses": {
+          "200": { "description": "Sikeres törlés" },
+          "403": { "description": "Nincs jogosultság" }
+        },
+        "security": [
+          { "bearerAuth": [] }
+        ]
       }
     }
+  },
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
   }
-  
+}

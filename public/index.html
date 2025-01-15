@@ -10,7 +10,7 @@
 <body class="bg-light">
     <div class="container py-5">
         <h1 class="text-center text-primary">Mérkőzés Kezelő Rendszer</h1>
-        <hr>
+        <hr width="100%" size="2">
 
         <!-- Bejelentkezés -->
         <section id="login-section" class="mb-4">
@@ -27,6 +27,7 @@
                 <button type="button" class="btn btn-primary w-100" onclick="login()">Bejelentkezés</button>
             </form>
         </section>
+        <hr width="100%" size="2">
 
         <!-- Mérkőzések -->
         <section id="matches-section" class="mb-4">
@@ -36,6 +37,7 @@
             </div>
             <ul id="matches-list" class="list-group"></ul>
         </section>
+        <hr width="100%" size="2">
 
         <!-- Új néző -->
         <section id="add-viewer-section" class="mb-4">
@@ -62,6 +64,7 @@
                 <button type="button" class="btn btn-primary w-100" onclick="addViewer()">Hozzáadás</button>
              </form>
         </section>
+        <hr width="100%" size="2">
 
         <!-- Mérkőzés beléptetés -->
         <section id="add-entry-section" class="mb-4">
@@ -79,9 +82,10 @@
                     <label for="entry-timestamp" class="form-label">Időpont:</label>
                     <input type="datetime-local" id="entry-timestamp" class="form-control">
                 </div>
-                <button type="button" class="btn btn-primary w-100" onclick="addEntry()">Beléptetés</button>
+                <button type="button" class="btn btn-primary w-100" onclick="addBelepo()">Beléptetés</button>
             </form>
         </section>
+        <hr width="100%" size="2">
 
         <!-- Új mérkőzés hozzáadása -->
         <section id="add-match-section" class="mb-4">
@@ -106,36 +110,39 @@
                 <button type="button" class="btn btn-primary w-100" onclick="addMatch()">Hozzáadás</button>
             </form>
         </section>
+        <hr width="100%" size="2">
 
         <section id="additional-functions" class="mb-4">
+
+
             <h2>További Funkciók</h2>
+            <hr width="100%" size="2">
+
             <!-- Nézőszám lekérdezése -->
-            <div class="mb-3">
-                <label for="meccs-id" class="form-label">Mérkőzés ID:</label>
-                <input type="number" id="meccs-id" class="form-control" placeholder="Add meg a mérkőzés ID-ját">
-                <button class="btn btn-primary w-100 mt-2" onclick="getViewerStats()">Nézőszám Lekérdezése</button>
-            </div>
             <section id="viewer-stats-section" class="mb-4">
                 <h2>Nézőszámok</h2>
                 <form id="viewer-stats-form" class="mb-3">
                     <label for="stats-match-id" class="form-label">Mérkőzés ID:</label>
                     <input type="number" id="stats-match-id" class="form-control mb-3">
-                    <button type="button" class="btn btn-primary w-100" onclick="getViewerStats()">Lekérdezés</button>
+                    <button type="button" class="btn btn-primary w-100" onclick="getNezok()">Lekérdezés</button>
                 </form>
                 <ul id="viewer-stats-list" class="list-group"></ul>
             </section>
-      
+            <hr width="100%" size="2">
+            
             <!-- Bajnoki mérkőzések -->
             <div class="mb-3">
-                <button class="btn btn-success w-100" onclick="getChampionshipMatches()">Bajnoki Mérkőzések</button>
+                <button class="btn btn-success w-100" onclick="getBajnokiMeccsek()">Bajnoki Mérkőzések</button>
                 <ul id="championship-matches" class="list-group mt-2"></ul>
             </div>
-      
+            <hr width="100%" size="2">
+
             <!-- Legutolsó mérkőzés jegyára -->
             <div class="mb-3">
-                <button class="btn btn-warning w-100" onclick="getLastMatchPrice()">Legutolsó Mérkőzés Jegyára</button>
+                <button class="btn btn-warning w-100" onclick="getUtolsoMeccsAr()">Legutolsó Mérkőzés Jegyára</button>
                 <div id="last-match-price" class="mt-2"></div>
             </div>
+            <hr width="100%" size="2">
       
             <!-- Mérkőzés törlése -->
             <div class="mb-3">
@@ -143,6 +150,7 @@
                 <input type="number" id="delete-id" class="form-control" placeholder="Add meg a törlendő mérkőzés ID-ját">
                 <button class="btn btn-danger w-100 mt-2" onclick="deleteMatch()">Mérkőzés Törlése</button>
             </div>
+            <hr width="100%" size="2">
         </section>
       
         <!-- Eredmény megjelenítése -->

@@ -1,15 +1,15 @@
 let token = "";
 
 function formatDate(utcDateString) {
-    const date = new Date(utcDateString);
+    var date = new Date(utcDateString);
     return date.toLocaleDateString("hu-HU", { timeZone: "Europe/Budapest" });
 }
 
 async function login() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
   
-    const response = await fetch("/login", {
+    var response = await fetch("/login", {
         method: "POST",
         headers: {
         "Content-Type": "application/json"
@@ -17,10 +17,10 @@ async function login() {
         body: JSON.stringify({ username, password })
     });
   
-    const resultElement = document.getElementById("result");
+    var resultElement = document.getElementById("result");
   
     try {
-        const data = await response.json();
+        var data = await response.json();
         if (response.ok) {
             token = data.token;
             resultElement.innerText = "Sikeres bejelentkezés! Token mentve.";
@@ -38,14 +38,14 @@ async function login() {
   
 
 async function getMatches() {
-    const response = await fetch("/meccsek");
-    const data = await response.json();
+    var response = await fetch("/meccsek");
+    var data = await response.json();
   
-    const matchesList = document.getElementById("matches-list");
+    var matchesList = document.getElementById("matches-list");
     matchesList.innerHTML = "";
     data.forEach(match => {
-        const formattedDate = formatDate(match.datum);
-        const li = document.createElement("li");
+        var formattedDate = formatDate(match.datum);
+        var li = document.createElement("li");
         li.className = "list-group-item";
         li.innerText = `${match.id} - ${formattedDate} ${match.kezdes} - ${match.tipus} (${match.belepo} Ft)`;
         matchesList.appendChild(li);
@@ -58,12 +58,12 @@ async function addMatch() {
         return;
     }
 
-    const datum = document.getElementById("datum").value;
-    const kezdes = document.getElementById("kezdes").value;
-    const belepo = document.getElementById("belepo").value;
-    const tipus = document.getElementById("tipus").value;
+    var datum = document.getElementById("datum").value;
+    var kezdes = document.getElementById("kezdes").value;
+    var belepo = document.getElementById("belepo").value;
+    var tipus = document.getElementById("tipus").value;
 
-    const response = await fetch("/meccsek", {
+    var response = await fetch("/meccsek", {
     method: "POST",
     headers: {
         "Content-Type": "application/json",
@@ -80,25 +80,25 @@ async function addMatch() {
     }
 }
 
-async function getViewerStats() {
-    const matchId = document.getElementById("stats-match-id").value;
+async function getNezok() {
+    var matchId = document.getElementById("stats-match-id").value;
   
     if (!matchId) {
         alert("Kérlek, add meg a mérkőzés ID-ját!");
         return;
     }
   
-    const response = await fetch(`/belepesek/${matchId}`, {
+    var response = await fetch(`/belepesek/${matchId}`, {
         headers: {
             "Authorization": `Bearer ${token}`
         }
     });
   
-    const statsList = document.getElementById("viewer-stats-list");
+    var statsList = document.getElementById("viewer-stats-list");
     statsList.innerHTML = "";
   
     if (response.ok) {
-        const data = await response.json();
+        var data = await response.json();
   
         if (data.length === 0) {
             statsList.innerHTML = `<li class="list-group-item text-danger">Nincs adat a megadott mérkőzéshez.</li>`;
@@ -106,7 +106,7 @@ async function getViewerStats() {
         }
   
         data.forEach((entry) => {
-            const li = document.createElement("li");
+            var li = document.createElement("li");
             li.className = "list-group-item";
             li.innerText = `${entry.nev} - ${
             entry.ferfi ? "Férfi" : "Nő"
@@ -121,15 +121,15 @@ async function getViewerStats() {
   }
   
   
-async function getChampionshipMatches() {
-    const response = await fetch("/bajnoki");
-    const list = document.getElementById("championship-matches");
+async function getBajnokiMeccsek() {
+    var response = await fetch("/bajnoki");
+    var list = document.getElementById("championship-matches");
     list.innerHTML = "";
   
     if (response.ok) {
-        const data = await response.json();
+        var data = await response.json();
         data.forEach(match => {
-        const li = document.createElement("li");
+            var li = document.createElement("li");
             li.className = "list-group-item";
             li.innerText = `Dátum: ${formatDate(match.datum)}`;
             list.appendChild(li);
@@ -139,12 +139,24 @@ async function getChampionshipMatches() {
     }
 }
   
-async function getLastMatchPrice() {
-        const response = await fetch("/utolsojegyar");
-        const resultElement = document.getElementById("last-match-price");
-  
+async function getUtolsoMeccsAr() {
+    
+    var resultElement = document.getElementById("last-match-price");
+
+    if (!token) {
+        alert("Először jelentkezz be!");
+        return;
+    }
+
+    var response = await fetch("/utolsojegyar", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+    
+
     if (response.ok) {
-        const data = await response.json();
+        var data = await response.json();
         resultElement.innerText = `Legutolsó mérkőzés jegyára: ${data[0]?.belepo || "N/A"} Ft`;
     } else {
         resultElement.innerText = "Hiba a jegyár lekérdezésekor.";
@@ -152,21 +164,21 @@ async function getLastMatchPrice() {
 }
   
 async function deleteMatch() {
-    const matchId = document.getElementById("delete-id").value;
+    var matchId = document.getElementById("delete-id").value;
   
     if (!token) {
         alert("Először jelentkezz be!");
         return;
     }
   
-    const response = await fetch(`/meccsek/${matchId}`, {
+    var response = await fetch(`/meccsek/${matchId}`, {
         method: "DELETE",
         headers: {
         Authorization: `Bearer ${token}`,
         },
     });
   
-    const resultElement = document.getElementById("result");
+    var resultElement = document.getElementById("result");
   
     if (response.ok) {
         resultElement.innerText = "Mérkőzés sikeresen törölve.";
@@ -179,11 +191,11 @@ async function deleteMatch() {
 }
 
 async function addViewer() {
-    const name = document.getElementById("viewer-name").value;
-    const gender = document.getElementById("viewer-gender").value;
-    const ticket = document.getElementById("viewer-ticket").value;
+    var name = document.getElementById("viewer-name").value;
+    var gender = document.getElementById("viewer-gender").value;
+    var ticket = document.getElementById("viewer-ticket").value;
   
-    const response = await fetch("/nezok", {
+    var response = await fetch("/nezok", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -199,12 +211,12 @@ async function addViewer() {
     }
 }
 
-async function addEntry() {
-    const viewerId = document.getElementById("entry-viewer-id").value;
-    const matchId = document.getElementById("entry-match-id").value;
-    const timestamp = document.getElementById("entry-timestamp").value;
+async function addBelepo() {
+    var viewerId = document.getElementById("entry-viewer-id").value;
+    var matchId = document.getElementById("entry-match-id").value;
+    var timestamp = document.getElementById("entry-timestamp").value;
   
-    const response = await fetch("/belepes", {
+    var response = await fetch("/belepes", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

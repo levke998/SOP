@@ -3,11 +3,11 @@ var express = require("express");
 var app = express();
 var mysql = require("mysql");
 var bodyParser = require("body-parser");
-const jwt = require("jsonwebtoken");
-const swaggerUi = require("swagger-ui-express");
-const swaggerDocument = require("./swagger.json");
-const secretKey = "your_secret_key";
-const cors = require('./cors');
+var jwt = require("jsonwebtoken");
+var swaggerUi = require("swagger-ui-express");
+var swaggerDocument = require("./swagger.json");
+var secretKey = "your_secret_key";
+var cors = require('./cors');
 
 //MySQL kapcsolat
 var connection = mysql.createConnection({
@@ -42,27 +42,37 @@ app.use(express.static("public"))
 
 
 //Middleware
+function verifyToken(token) {
+    try {
+        var user = jwt.verify(token, secretKey);
+        return { valid: true, user };
+    } catch (err) {
+        return { valid: false, error: err };
+    }
+}
+
 function authenticateToken(req, res, next) {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    var token = req.headers["authorization"].split(" ")[1];
 
     if (!token) {
         return res.status(403).send("Nincs jogosultság");
     }
 
-    jwt.verify(token, secretKey, (err, user) => {
-        if (err) {
-            return res.status(403).send("Érvénytelen token");
-        }
-    req.user = user;
+    var result = verifyToken(token);
+    if (!result.valid) {
+        return res.status(403).send("Érvénytelen token");
+    }
+
+    req.user = result.user; // A dekódolt token információi
     next();
-  });
 }
+
+
 
 
 // Login
 app.post("/login", function (req, res) {
-    const { username, password } = req.body;
+    var { username, password } = req.body;
 
     connection.query("SELECT * FROM users WHERE username = ? AND pw = ?",[username, password],function (error, results) {
         if (error) {
@@ -70,7 +80,7 @@ app.post("/login", function (req, res) {
         }
 
         if (results.length > 0) {
-            const token = jwt.sign({ username }, secretKey, { expiresIn: "1h" });
+            var token = jwt.sign({ username }, secretKey, { expiresIn: "1h" });
             res.json({ token });
         } else {
             res.status(401).json({ message: "Hibás felhasználónév vagy jelszó" });
@@ -91,18 +101,16 @@ app.get("/meccsek", function (req, res) {
 
 //Bajnoki mérkőzések dátumainak időrendi megjelenítése
 app.get("/bajnoki", function (req, res) {
-    const sql = "SELECT datum FROM meccs WHERE tipus = 'bajnoki' ORDER BY datum";
-    connection.query(sql, function (error, results) {
+    connection.query("SELECT datum FROM meccs WHERE tipus = 'bajnoki' ORDER BY datum", function (error, results) {
         if (error) throw error;
         res.json(results);
     });
 });
 
 
-//Nézőszám lekérdezése adott mérkőzésre
+//Nézőszám lekérdezése adott mérkőzésre  -> Csak tokennel!
 app.get("/belepesek/:meccsid", authenticateToken, function (req, res) {
-    const sql = `SELECT n.nev, n.ferfi, n.berletes, b.idopont FROM belepes b JOIN nezo n ON b.nezoid = n.id WHERE b.meccsid = ? ORDER BY b.idopont`;
-    connection.query(sql, [req.params.meccsid], function (error, results) {
+    connection.query(`SELECT n.nev, n.ferfi, n.berletes, b.idopont FROM belepes b JOIN nezo n ON b.nezoid = n.id WHERE b.meccsid = ? ORDER BY b.idopont`, [req.params.meccsid], function (error, results) {
         if (error) {
             return res.status(500).json({ message: "Adatbázis hiba" });
         }
@@ -112,9 +120,8 @@ app.get("/belepesek/:meccsid", authenticateToken, function (req, res) {
   
 
 //Idény legutolsó mérkőzésének jegyára
-app.get("/utolsojegyar", function (req, res) {
-    const sql = "SELECT belepo FROM meccs ORDER BY datum DESC, kezdes DESC LIMIT 1";
-    connection.query(sql, function (error, results) {
+app.get("/utolsojegyar",authenticateToken, function (req, res) {
+    connection.query("SELECT belepo FROM meccs ORDER BY datum DESC, kezdes DESC LIMIT 1", function (error, results) {
         if (error) throw error;
         res.json(results);
     });
@@ -123,8 +130,8 @@ app.get("/utolsojegyar", function (req, res) {
 
 //Új mérkőzés hozzáadása -> Csak tokennel!
 app.post("/meccsek", authenticateToken, function (req, res) {
-    var postData = req.body;
-    connection.query("INSERT INTO meccs SET ?", postData, function (error, results) {
+    var post = req.body;
+    connection.query("INSERT INTO meccs SET ?", post, function (error, results) {
         if (error) throw error;
         res.json(results);
     });
@@ -133,10 +140,8 @@ app.post("/meccsek", authenticateToken, function (req, res) {
 
 //Nézők hozzáadása -> Csak tokennel!
 app.post("/nezok", authenticateToken, function (req, res) {
-    const { nev, ferfi, berletes } = req.body;
-  
-    const sql = "INSERT INTO nezo (nev, ferfi, berletes) VALUES (?, ?, ?)";
-    connection.query(sql, [nev, ferfi, berletes], function (error, results) {
+    var { nev, ferfi, berletes } = req.body;
+    connection.query("INSERT INTO nezo (nev, ferfi, berletes) VALUES (?, ?, ?)", [nev, ferfi, berletes], function (error, results) {
       if (error) {
         return res.status(500).json({ message: "Adatbázis hiba" });
       }
@@ -147,22 +152,23 @@ app.post("/nezok", authenticateToken, function (req, res) {
 
 //Nézők beléptetése mérkőzésre -> Csak tokennel!
 app.post("/belepes", authenticateToken, function (req, res) {
-    const { nezoid, meccsid, idopont } = req.body;
+    var { nezoid, meccsid, idopont } = req.body;
   
-    const sql = "INSERT INTO belepes (nezoid, meccsid, idopont) VALUES (?, ?, ?)";
-    connection.query(sql, [nezoid, meccsid, idopont], function (error, results) {
+    connection.query("INSERT INTO belepes (nezoid, meccsid, idopont) VALUES (?, ?, ?)", [nezoid, meccsid, idopont], function (error) {
         if (error) {
             return res.status(500).json({ message: "Adatbázis hiba" });
         }
-        res.status(201).json({ message: "Belépés sikeresen rögzítve" });
+        res.status(201).json({ message: "Belépés sikeresen rögzítve"});
     });
 });
 
 
 //Mérkőzés törlése ID alapján -> Csak tokennel!
 app.delete("/meccsek/:id", authenticateToken, function (req, res) {
-    connection.query("DELETE FROM meccs WHERE id = ?", [req.params.id], function (error, results) {
-        if (error) throw error;
-        res.send("Mérkőzés törölve.");
+    connection.query("DELETE FROM meccs WHERE id = ?", [req.params.id], function (error) {
+        if (error) {
+            return res.status(500).json({ message: "Adatbázis hiba: " + error.message });
+        }
+        res.send("A mérkőzés és kapcsolódó adatok sikeresen törölve.");
     });
 });
