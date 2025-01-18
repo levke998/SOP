@@ -11,9 +11,7 @@ async function login() {
   
     var response = await fetch("/login", {
         method: "POST",
-        headers: {
-        "Content-Type": "application/json"
-        },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ username, password })
     });
   
@@ -23,15 +21,12 @@ async function login() {
         var data = await response.json();
         if (response.ok) {
             token = data.token;
-            resultElement.innerText = "Sikeres bejelentkezés! Token mentve.";
-            resultElement.className = "alert alert-success";
+            alert("Ez volt aztán a sikeres bejelentkezés!!!! Tokent meg geltettem a polcra...");
         } else {
-        resultElement.innerText = data.message || "Hibás felhasználónév vagy jelszó.";
-        resultElement.className = "alert alert-danger";
+        alert(data.message);
         }
     } catch (err) {
-        resultElement.innerText = "Nem megfelelő szerverválasz.";
-        resultElement.className = "alert alert-danger";
+        alert(data.message);
     }
 }
   
@@ -53,11 +48,6 @@ async function getMatches() {
 }
 
 async function addMatch() {
-    if (!token) {
-        document.getElementById("result").innerText = "Először jelentkezz be!";
-        return;
-    }
-
     var datum = document.getElementById("datum").value;
     var kezdes = document.getElementById("kezdes").value;
     var belepo = document.getElementById("belepo").value;
@@ -72,12 +62,21 @@ async function addMatch() {
         body: JSON.stringify({ datum, kezdes, belepo, tipus })
     });
 
-    if (response.ok) {
-        document.getElementById("result").innerText = "Mérkőzés sikeresen hozzáadva!";
-        getMatches();
-    } else {
-        document.getElementById("result").innerText = "Hiba a hozzáadás során.";
+    var message = await response.text();
+
+    try{
+        if (response.ok) {
+            alert(message);
+            getMatches();
+        } else {
+            alert(message);
+        }
     }
+    catch (err) {
+        alert("Há' itt meg van valami baj... ");
+    }
+
+   
 }
 
 async function getNezok() {
@@ -116,7 +115,7 @@ async function getNezok() {
         statsList.appendChild(li);
         });
     } else {
-        alert("Hiba a nézőszám lekérdezésekor.");
+        alert("Há' itt meg van valami baj... ");
     }
   }
   
@@ -165,72 +164,98 @@ async function getUtolsoMeccsAr() {
   
 async function deleteMatch() {
     var matchId = document.getElementById("delete-id").value;
-  
+
     if (!token) {
         alert("Először jelentkezz be!");
         return;
     }
-  
-    var response = await fetch(`/meccsek/${matchId}`, {
-        method: "DELETE",
-        headers: {
-        Authorization: `Bearer ${token}`,
-        },
-    });
-  
-    var resultElement = document.getElementById("result");
-  
-    if (response.ok) {
-        resultElement.innerText = "Mérkőzés sikeresen törölve.";
-        resultElement.className = "alert alert-success";
-        getMatches();
-    } else {
-        resultElement.innerText = "Hiba a mérkőzés törlésekor.";
-        resultElement.className = "alert alert-danger";
+
+    try {
+        var response = await fetch(`/meccsek/${matchId}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        var message = await response.text();
+
+        if (response.ok) {
+            alert(message);
+            getMatches();
+        } else {
+            alert(message);
+        }
+    } catch (error) {
+
+        alert("Há' itt meg van valami baj... ");
     }
 }
+
 
 async function addViewer() {
     var name = document.getElementById("viewer-name").value;
     var gender = document.getElementById("viewer-gender").value;
     var ticket = document.getElementById("viewer-ticket").value;
-  
-    var response = await fetch("/nezok", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ nev: name, ferfi: gender === "true", berletes: ticket === "true" })
-    });
-  
-    if (response.ok) {
-        alert("Néző sikeresen hozzáadva!");
-    } else {
-        alert("Hiba történt a néző hozzáadásakor.");
+
+    try {
+        var response = await fetch("/nezok", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                nev: name,
+                ferfi: gender === "true",
+                berletes: ticket === "true"
+            })
+        });
+
+        var data = await response.json();
+
+        if (response.ok) {
+            alert(data.message);
+        } else {
+            
+            alert(data.message);
+        }
+    } catch (error) {
+        alert("Há' itt meg van valami baj... ");
     }
 }
+
+
 
 async function addBelepo() {
     var viewerId = document.getElementById("entry-viewer-id").value;
     var matchId = document.getElementById("entry-match-id").value;
     var timestamp = document.getElementById("entry-timestamp").value;
-  
-    var response = await fetch("/belepes", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ nezoid: viewerId, meccsid: matchId, idopont: timestamp })
-    });
-  
-    if (response.ok) {
-        alert("Néző sikeresen beléptetve!");
-    } else {
-        alert("Hiba történt a beléptetés során.");
+
+    try {
+        var response = await fetch("/belepes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                nezoid: viewerId,
+                meccsid: matchId,
+                idopont: timestamp
+            })
+        });
+
+        var data = await response.json();
+
+        if (response.ok) {
+            alert(data.message);
+        } else {
+            alert(data.message); 
+        }
+    } catch (error) {
+        alert("Há' itt meg van valami baj... "); 
     }
-  }
-  
+}
   
   

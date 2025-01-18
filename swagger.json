@@ -2,8 +2,8 @@
   "swagger": "2.0",
   "info": {
     "version": "1.0.0",
-    "title": "Mérkőzés API",
-    "description": "Egy RESTful API a mérkőzések, nézők és belépések kezelésére."
+    "title": "Tábla beadando Reszt full API ",
+    "description": "Mérkőzéses webes APIs."
   },
   "host": "127.0.0.1:3000",
   "basePath": "/",
@@ -29,7 +29,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Sikeres bejelentkezés",
+            "description": "Sikeres bejelentkezés! Token mentve.",
             "schema": {
               "type": "object",
               "properties": {
@@ -37,7 +37,7 @@
               }
             }
           },
-          "401": { "description": "Hibás felhasználónév vagy jelszó" }
+          "401": { "description": "Te kis huncut! Hibás felhasználónév vagy jelszó..." }
         }
       }
     },
@@ -84,7 +84,7 @@
         ],
         "responses": {
           "201": { "description": "Mérkőzés sikeresen hozzáadva" },
-          "403": { "description": "Nincs jogosultság" }
+          "403": { "description": "Nananananaaaaa... nincs is jogosultságod! Lépj be!" }
         },
         "security": [
           { "bearerAuth": [] }
@@ -132,7 +132,7 @@
               }
             }
           },
-          "403": { "description": "Nincs jogosultság" }
+          "403": { "description": "Nananananaaaaa... nincs is jogosultságod! Lépj be!" }
         },
         "security": [
           { "bearerAuth": [] }
@@ -155,7 +155,7 @@
               }
             }
           },
-          "403": { "description": "Nincs jogosultság" }
+          "403": { "description": "Nananananaaaaa... nincs is jogosultságod! Lépj be!" }
         },
         "security": [
           { "bearerAuth": [] }
@@ -175,7 +175,7 @@
         ],
         "responses": {
           "200": { "description": "Sikeres törlés" },
-          "403": { "description": "Nincs jogosultság" }
+          "403": { "description": "Nananananaaaaa... nincs is jogosultságod! Lépj be!!" }
         },
         "security": [
           { "bearerAuth": [] }
